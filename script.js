@@ -3,6 +3,7 @@
 ════════════════════════════════════════════ */
 const stage = document.getElementById('stage');
 const seyClip = document.getElementById('sey-clip');
+const seyVisual = document.getElementById('sey-visual');
 const seyImg = document.getElementById('sey-img');
 const pRing = document.getElementById('p-ring');
 const pInner = document.getElementById('p-inner');
@@ -60,11 +61,14 @@ const islandModalDetails = [
 ];
 const islandModalCharter = document.getElementById('island-modal-charter');
 const mobileBreakpoint = window.matchMedia('(max-width: 768px)');
+const HERO_IMAGE_SRC = 'assets/images/seychelles-hero-aerial.jpg';
 
 let zoomIntensity = 1;
 let lastContactTrigger = null;
 let lastIslandTrigger = null;
 let activeIslandId = null;
+let lockedScrollY = 0;
+let bodyLockStyles = null;
 
 const islandContent = {
   mahe: {
@@ -141,18 +145,208 @@ function easeIn(t) {
   return t * t * t;
 }
 
-function syncModalState() {
-  const hasOpenModal = Boolean(
+function setHeroVisualScale(scale) {
+  if (seyImg instanceof HTMLImageElement) {
+    seyImg.style.transform = `scale(${scale}) translateZ(0)`;
+  }
+}
+
+function primeHeroImage() {
+  if (!(seyImg instanceof HTMLImageElement)) return;
+
+  seyImg.loading = 'eager';
+  seyImg.decoding = 'async';
+  seyImg.fetchPriority = 'high';
+
+  if (seyImg.getAttribute('src') !== HERO_IMAGE_SRC) {
+    seyImg.setAttribute('src', HERO_IMAGE_SRC);
+  }
+
+  if (seyVisual) {
+    seyVisual.style.display = 'none';
+  }
+
+  if (seyImg.complete) {
+    requestAnimationFrame(tick);
+    return;
+  }
+
+  seyImg.addEventListener('load', () => {
+    requestAnimationFrame(tick);
+  }, { once: true });
+}
+
+function scheduleStageSync() {
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(tick);
+    });
+  });
+}
+
+function hasOpenModal() {
+  return Boolean(
     contactModal?.classList.contains('is-open') ||
     islandModal?.classList.contains('is-open')
   );
+}
 
-  document.body.classList.toggle('modal-open', hasOpenModal);
+function getActiveModal() {
+  if (contactModal?.classList.contains('is-open')) return contactModal;
+  if (islandModal?.classList.contains('is-open')) return islandModal;
+  return null;
+}
+
+function isInsideActiveModal(target) {
+  const modal = getActiveModal();
+  return Boolean(modal && target instanceof Node && modal.contains(target));
+}
+
+function findScrollableAncestor(node) {
+  let el = node instanceof Element ? node : null;
+  const modal = getActiveModal();
+
+  while (el && modal && modal.contains(el)) {
+    const style = window.getComputedStyle(el);
+    const canScrollY =
+      /(auto|scroll|overlay)/.test(style.overflowY) &&
+      el.scrollHeight > el.clientHeight + 1;
+
+    if (canScrollY) return el;
+    el = el.parentElement;
+  }
+
+  return null;
+}
+
+function allowTouchScrollWithinModal(event) {
+  const scrollable = findScrollableAncestor(event.target);
+  if (!scrollable) return false;
+
+  const touch = event.touches?.[0];
+  if (!touch) return true;
+
+  const currentY = touch.clientY;
+  const lastY = allowTouchScrollWithinModal.lastY ?? currentY;
+  const deltaY = currentY - lastY;
+  allowTouchScrollWithinModal.lastY = currentY;
+
+  const atTop = scrollable.scrollTop <= 0;
+  const atBottom =
+    scrollable.scrollTop + scrollable.clientHeight >= scrollable.scrollHeight - 1;
+
+  if ((atTop && deltaY > 0) || (atBottom && deltaY < 0)) {
+    return false;
+  }
+
+  return true;
+}
+allowTouchScrollWithinModal.lastY = null;
+
+function resetTouchTracking() {
+  allowTouchScrollWithinModal.lastY = null;
+}
+
+function handleGlobalWheelLock(event) {
+  if (!hasOpenModal()) return;
+  if (!isInsideActiveModal(event.target)) {
+    event.preventDefault();
+    return;
+  }
+
+  const scrollable = findScrollableAncestor(event.target);
+  if (!scrollable) {
+    event.preventDefault();
+    return;
+  }
+
+  const deltaY = event.deltaY;
+  const atTop = scrollable.scrollTop <= 0;
+  const atBottom =
+    scrollable.scrollTop + scrollable.clientHeight >= scrollable.scrollHeight - 1;
+
+  if ((atTop && deltaY < 0) || (atBottom && deltaY > 0)) {
+    event.preventDefault();
+  }
+}
+
+function handleGlobalTouchMoveLock(event) {
+  if (!hasOpenModal()) return;
+  if (!isInsideActiveModal(event.target)) {
+    event.preventDefault();
+    return;
+  }
+
+  if (!allowTouchScrollWithinModal(event)) {
+    event.preventDefault();
+  }
+}
+
+function handleGlobalTouchStartLock() {
+  if (!hasOpenModal()) return;
+  resetTouchTracking();
+}
+
+function lockPageScroll() {
+  lockedScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+
+  if (!bodyLockStyles) {
+    bodyLockStyles = {
+      position: document.body.style.position,
+      top: document.body.style.top,
+      left: document.body.style.left,
+      right: document.body.style.right,
+      width: document.body.style.width,
+      overflow: document.body.style.overflow
+    };
+  }
+
+  document.body.style.position = 'fixed';
+  document.body.style.top = `-${lockedScrollY}px`;
+  document.body.style.left = '0';
+  document.body.style.right = '0';
+  document.body.style.width = '100%';
+  document.body.style.overflow = 'hidden';
+}
+
+function unlockPageScroll() {
+  const y = lockedScrollY;
+  const saved = bodyLockStyles;
+
+  document.body.style.position = saved?.position ?? '';
+  document.body.style.top = saved?.top ?? '';
+  document.body.style.left = saved?.left ?? '';
+  document.body.style.right = saved?.right ?? '';
+  document.body.style.width = saved?.width ?? '';
+  document.body.style.overflow = saved?.overflow ?? '';
+
+  bodyLockStyles = null;
+  resetTouchTracking();
+
+  requestAnimationFrame(() => {
+    window.scrollTo(0, y);
+    requestAnimationFrame(() => {
+      window.scrollTo(0, y);
+    });
+  });
+}
+
+function syncModalState() {
+  const open = hasOpenModal();
+
+  document.body.classList.toggle('modal-open', open);
+
+  if (open) {
+    if (document.body.style.position !== 'fixed') {
+      lockPageScroll();
+    }
+  } else if (document.body.style.position === 'fixed') {
+    unlockPageScroll();
+  }
 }
 
 // Smooth, cinematic zoom curve — no explosive jump
 function zoomCurve(t) {
-  // Gentle ease-in, then steady ease-out. No sudden acceleration.
   return easeInOut(t);
 }
 
@@ -184,19 +378,73 @@ function getWindowConfig() {
   };
 }
 
+function resetStageToInitial(config = getWindowConfig()) {
+  seyClip.style.top = '';
+  seyClip.style.left = '';
+  seyClip.style.transform = '';
+  seyClip.style.clipPath = `ellipse(${config.clipX}vmin ${config.clipY}vmin at ${config.x}% ${config.y}%)`;
+  pRing.style.top = `${config.y}%`;
+  pRing.style.left = `${config.x}%`;
+  pInner.style.top = `${config.y}%`;
+  pInner.style.left = `${config.x}%`;
+  pRing.style.transform = `translate(-50%,-50%) scale(${config.baseScale})`;
+  pInner.style.transform = `translate(-50%,-50%) scale(${config.baseScale * 0.88})`;
+  pRing.style.opacity = String(config.baseOpacity);
+  pInner.style.opacity = String(config.baseOpacity);
+
+  seyClip.style.opacity = String(config.baseOpacity);
+  setHeroVisualScale(config.imageStart);
+
+  cabinEl.style.opacity = '1';
+  cabinGlow.style.opacity = '1';
+  document
+    .querySelectorAll('.cabin-overhead,.cabin-vignette-l,.cabin-vignette-r,.cabin-seats')
+    .forEach(el => {
+      el.style.opacity = '1';
+    });
+
+  bloom.style.opacity = '0';
+
+  heroL1.style.opacity = '1';
+  heroL1.style.transform = 'translateX(-50%) translateY(0px)';
+  nudge.style.opacity = '1';
+
+  heroL3.style.top = `${config.arrivalY}%`;
+  heroL3.style.opacity = '0';
+  heroL3.style.filter = 'blur(18px)';
+  heroL3.style.transform = 'translate(-50%, calc(-50% + 90px)) scale(0.9)';
+
+  arrivalWord.style.opacity = '0.65';
+  arrivalWord.style.transform = 'translateY(20px)';
+  arrivalCoord.style.opacity = '0';
+  arrivalCoord.style.transform = 'translateY(28px)';
+
+  nav.classList.remove('scrolled');
+}
+
 function tick() {
-  const rect = stage.getBoundingClientRect();
-  const scrollable = stage.offsetHeight - window.innerHeight;
-  const raw = clamp(-rect.top / scrollable, 0, 1);
-  const p = clamp(raw * zoomIntensity, 0, 1);
+  if (hasOpenModal()) return;
+
+  const stageStart = stage.offsetTop;
+  const stageScrollRange = Math.max(stage.offsetHeight - window.innerHeight, 1);
+  const pageTop = window.scrollY || document.documentElement.scrollTop || 0;
   const config = getWindowConfig();
 
-  // zE drives everything — 0 = porthole at rest, 1 = fully open
+  if (pageTop <= stageStart + 1) {
+    resetStageToInitial(config);
+    return;
+  }
+
+  const raw = clamp((pageTop - stageStart) / stageScrollRange, 0, 1);
+  const p = clamp(raw * zoomIntensity, 0, 1);
+
   const zE = zoomCurve(clamp(p / 0.85, 0, 1));
 
-  // Scale factor for porthole ring
   const k = lerp(config.baseScale, 20, zE);
   const clipScale = k / config.baseScale;
+  seyClip.style.top = '';
+  seyClip.style.left = '';
+  seyClip.style.transform = '';
   pRing.style.top = `${config.y}%`;
   pRing.style.left = `${config.x}%`;
   pInner.style.top = `${config.y}%`;
@@ -204,18 +452,14 @@ function tick() {
   pRing.style.transform = `translate(-50%,-50%) scale(${k})`;
   pInner.style.transform = `translate(-50%,-50%) scale(${k * 0.88})`;
 
-  // Clip path tracks ring
   seyClip.style.clipPath = `ellipse(${config.clipX * clipScale}vmin ${config.clipY * clipScale}vmin at ${config.x}% ${config.y}%)`;
   seyClip.style.opacity = config.baseOpacity + ((1 - config.baseOpacity) * easeOut(zE));
 
-  // Image creeps forward as we punch through
-  seyImg.style.transform = `scale(${lerp(config.imageStart, config.imageEnd, easeInOut(zE))})`;
+  setHeroVisualScale(lerp(config.imageStart, config.imageEnd, easeInOut(zE)));
 
-  // Ring fades as it expands past the screen
   pRing.style.opacity = Math.max(0, config.baseOpacity - (k - config.baseScale) / 6);
   pInner.style.opacity = Math.max(0, config.baseOpacity - (k - config.baseScale) / 5);
 
-  // Cabin layers fade out together, smoothly
   const cabinFade = Math.max(0, 1 - easeInOut(clamp(p / 0.55, 0, 1)));
   cabinEl.style.opacity = cabinFade;
   cabinGlow.style.opacity = cabinFade;
@@ -225,19 +469,14 @@ function tick() {
       el.style.opacity = Math.max(0, 1 - easeInOut(clamp(p / 0.45, 0, 1)));
     });
 
-  // ── BLOOM — gentle warm glow that rises WITH the arrival text, not before ──
-  // Starts fading in at p=0.60, peaks at p=0.80, holds
   const bloomIn = clamp((p - 0.60) / 0.25, 0, 1);
   bloom.style.opacity = easeOut(bloomIn) * 0.7;
 
-  // ── HERO COPY ──
-  // L1 fades out in the first 20% of scroll
   const l1Out = clamp(p / 0.20, 0, 1);
   heroL1.style.opacity = 1 - easeOut(l1Out);
   heroL1.style.transform = `translateX(-50%) translateY(${l1Out * 24}px)`;
   nudge.style.opacity = 1 - easeOut(clamp(p / 0.12, 0, 1));
 
-  // L3 — animate the entire arrival lockup onto the screen as the image settles
   const l3In = clamp((p - 0.58) / 0.24, 0, 1);
   const l3E = easeOut(l3In);
   const l3Scale = lerp(0.9, 1, l3E);
@@ -256,12 +495,20 @@ function tick() {
   arrivalCoord.style.opacity = coordIn;
   arrivalCoord.style.transform = `translateY(${lerp(28, 0, coordIn)}px)`;
 
-  // Nav bg on scroll
   nav.classList.toggle('scrolled', window.scrollY > 100);
 }
 
 window.addEventListener('scroll', tick, { passive: true });
+window.addEventListener('resize', scheduleStageSync);
+window.addEventListener('pageshow', scheduleStageSync);
+window.addEventListener('load', scheduleStageSync);
+document.addEventListener('wheel', handleGlobalWheelLock, { passive: false });
+document.addEventListener('touchstart', handleGlobalTouchStartLock, { passive: true });
+document.addEventListener('touchmove', handleGlobalTouchMoveLock, { passive: false });
+
+primeHeroImage();
 tick();
+scheduleStageSync();
 
 function setNavOpen(isOpen) {
   nav.classList.toggle('open', isOpen);
@@ -275,7 +522,9 @@ navToggle.addEventListener('click', () => {
 });
 
 mobileMenu.querySelectorAll('a, button').forEach(el => {
-  el.addEventListener('click', () => setNavOpen(false));
+  el.addEventListener('click', () => {
+    setNavOpen(false);
+  });
 });
 
 document.querySelectorAll('.nav-cta').forEach(el => {
@@ -322,7 +571,7 @@ nudge.addEventListener('click', () => {
 
 mobileBreakpoint.addEventListener('change', () => {
   setNavOpen(false);
-  tick();
+  scheduleStageSync();
 });
 
 /* ════════════════════════════════════════════
@@ -336,7 +585,6 @@ const observer = new IntersectionObserver(entries => {
 
 document.querySelectorAll('[data-reveal]').forEach(el => observer.observe(el));
 
-// Day cards need individual observation (they start opacity:0 independently)
 const dayObserver = new IntersectionObserver(entries => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
@@ -373,7 +621,8 @@ function openContactModal(trigger, preset = {}) {
   }
 
   syncModalState();
-  contactModal.querySelector('input, textarea')?.focus();
+  contactModal.querySelector('input, textarea, button')?.focus({ preventScroll: true });
+  scheduleStageSync();
 }
 
 function closeContactModal() {
@@ -382,7 +631,8 @@ function closeContactModal() {
   contactModal.setAttribute('aria-hidden', 'true');
   setContactView('form');
   syncModalState();
-  lastContactTrigger?.focus();
+  lastContactTrigger?.focus({ preventScroll: true });
+  scheduleStageSync();
 }
 
 function renderIslandModal(islandId) {
@@ -418,13 +668,15 @@ function openIslandModal(islandId, trigger) {
 
   const islandImage = trigger?.querySelector('img');
   if (islandImage instanceof HTMLImageElement) {
-    islandModalMedia.style.backgroundImage = `linear-gradient(180deg, oklch(0% 0 0 / .04), oklch(0% 0 0 / .56)), url("${islandImage.src}")`;
+    islandModalMedia.style.backgroundImage =
+      `linear-gradient(180deg, oklch(0% 0 0 / .04), oklch(0% 0 0 / .56)), url("${islandImage.src}")`;
   }
 
   islandModal.classList.add('is-open');
   islandModal.setAttribute('aria-hidden', 'false');
   syncModalState();
-  islandModal.querySelector('[data-close-island-modal]')?.focus();
+  islandModal.querySelector('[data-close-island-modal]')?.focus({ preventScroll: true });
+  scheduleStageSync();
 }
 
 function closeIslandModal(restoreFocus = true) {
@@ -435,8 +687,10 @@ function closeIslandModal(restoreFocus = true) {
   syncModalState();
 
   if (restoreFocus) {
-    lastIslandTrigger?.focus();
+    lastIslandTrigger?.focus({ preventScroll: true });
   }
+
+  scheduleStageSync();
 }
 
 contactTriggers.forEach(trigger => {
@@ -452,7 +706,7 @@ contactForm?.addEventListener('submit', e => {
   e.preventDefault();
   contactForm.reset();
   setContactView('success');
-  contactModal?.querySelector('.contact-modal__done')?.focus();
+  contactModal?.querySelector('.contact-modal__done')?.focus({ preventScroll: true });
 });
 
 islandCards.forEach((card, index) => {
@@ -547,7 +801,6 @@ document.getElementById('tw-voice').addEventListener('change', e => {
   window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { voice: e.target.value } }, '*');
 });
 
-// Init from defaults
 applyAccent(TWEAK_DEFAULTS.accent);
 zoomIntensity = TWEAK_DEFAULTS.zoomIntensity;
 document.getElementById('tw-zoom').value = zoomIntensity;
