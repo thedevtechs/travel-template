@@ -17,7 +17,7 @@
     <li><a href="#book">Charter</a></li>
   </ul>
   <div class="nav-actions">
-    <button class="nav-cta nav-cta-desktop">Reserve</button>
+    <button class="nav-cta nav-cta-desktop" type="button" data-contact-trigger="reserve">Reserve</button>
     <button class="nav-toggle" id="nav-toggle" type="button" aria-label="Open navigation menu" aria-controls="mobile-menu" aria-expanded="false">
       <span></span>
       <span></span>
@@ -28,7 +28,7 @@
     <a href="#crossing">The Journey</a>
     <a href="#islands">The Islands</a>
     <a href="#book">Charter</a>
-    <button class="nav-cta nav-cta-mobile" type="button">Reserve</button>
+    <button class="nav-cta nav-cta-mobile" type="button" data-contact-trigger="reserve">Reserve</button>
   </div>
 </nav>
 
@@ -118,7 +118,7 @@
   <div class="arrival-content" data-reveal="">
     <div class="eyebrow">The Arrival</div>
     <h2 class="section-title section-title-narrow">
-      Mahé receives you<br><em>the way all great<br>destinations do —</em><br>slowly, warmly,<br>without rush.
+      Mahé receives you the way all great destinations do — slowly, warmly, without rush.
     </h2>
     <p class="section-body">
       Step off the aircraft. Warm air. The scent of frangipani. A transfer already waiting. Your villa has been ready since morning.
@@ -132,16 +132,193 @@
 </section>
 
 <!-- ══════════════════════════════════════════
-     QUOTE
+     ITINERARY
 ═══════════════════════════════════════════ -->
-<section class="quote-section">
-  <div class="quote-inner quote-card" data-reveal="">
-    <div class="quote-kicker">The Feeling</div>
-    <span class="q-mark">"</span>
-    <p class="q-text">The best private journeys do not announce luxury. They let it unfold quietly, in perfect order, with nothing left for you to manage.</p>
-    <p class="q-sub">From wheels down to villa doors, every detail should feel inevitable.</p>
-    <p class="q-attr">— Seychelles Charter Desk</p>
+
+<section class="itin-section" id="itinerary">
+
+  <!-- Ghost gradient atmosphere -->
+  <div class="itin-atmosphere" aria-hidden="true">
+    <div class="itin-atmo-orb itin-atmo-orb--a"></div>
+    <div class="itin-atmo-orb itin-atmo-orb--b"></div>
+    <div class="itin-atmo-beam"></div>
   </div>
+
+  <div class="itin-shell">
+    <!-- ── Section header ── -->
+    <div class="itin-header" data-reveal="">
+      <div class="itin-label">
+        <span class="itin-label__line"></span>
+        The Journey, Composed
+        <span class="itin-label__line"></span>
+      </div>
+      <p class="itin-kicker">For honeymoons, family escapes, celebratory weekends, and multi-island charters alike.</p>
+      <h2 class="itin-title">Your itinerary should feel like desire in motion, not logistics in sequence.</h2>
+      <p class="itin-sub">We shape every trip around a mood: the anticipation before touchdown, the calm of a ready arrival, the beauty of moving on at exactly the right moment, and the quiet ease of knowing the next scene is already set.</p>
+    </div>
+
+    <div class="itin-showcase" data-reveal="">
+      <article class="itin-promise">
+        <span class="itin-promise__eyebrow">Flexible By Design</span>
+        <p class="itin-promise__quote">Any island. Any sequence. One uninterrupted feeling.</p>
+        <p class="itin-promise__copy">Start with a single immaculate arrival, stretch into a slow island circuit, or layer villas, marinas, and air transfers into something more cinematic. The route changes to fit the trip. The emotional rhythm stays seamless.</p>
+        <div class="itin-promise__chips" aria-label="Trip moments we coordinate">
+          <span>Jet arrivals</span>
+          <span>Villa access</span>
+          <span>Yacht handoffs</span>
+          <span>Inter-island air</span>
+        </div>
+      </article>
+
+      <div class="itin-moods" aria-hidden="true">
+        <article class="itin-mood-card">
+          <span class="itin-mood-card__label">Anticipation</span>
+          <strong class="itin-mood-card__title">Before touchdown, the stay already feels underway.</strong>
+          <p class="itin-mood-card__copy">Timing, permissions, and onward movement are quietly locked before you arrive.</p>
+        </article>
+        <article class="itin-mood-card">
+          <span class="itin-mood-card__label">Flow</span>
+          <strong class="itin-mood-card__title">Every handoff feels like a continuation, never an interruption.</strong>
+          <p class="itin-mood-card__copy">Runway, launch, car, villa, and departure lounge read as one composed gesture.</p>
+        </article>
+        <article class="itin-mood-card">
+          <span class="itin-mood-card__label">Freedom</span>
+          <strong class="itin-mood-card__title">The plan holds so lightly it feels like spontaneity.</strong>
+          <p class="itin-mood-card__copy">Enough structure to feel effortless, enough freedom to feel entirely your own.</p>
+        </article>
+      </div>
+    </div>
+
+    <!-- ── Emotional journey phases ── -->
+    <div class="itin-timeline" data-reveal="">
+
+      <article class="itin-day">
+        <div class="itin-day__num">
+          <span class="itin-day__index">01</span>
+          <div class="itin-day__line"></div>
+        </div>
+        <div class="itin-day__body">
+          <div class="itin-day__tag">Opening Move</div>
+          <h3 class="itin-day__title">Land into anticipation, not admin.</h3>
+          <p class="itin-day__copy">The runway arrival, customs flow, and onward transfer read as one elegant gesture, so the very first emotional note is relief, not process.</p>
+          <div class="itin-day__meta">
+            <span>Runway reception</span>
+            <span>Customs cleared</span>
+            <span>Villa or marina ready</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="itin-day">
+        <div class="itin-day__num">
+          <span class="itin-day__index">02</span>
+          <div class="itin-day__line"></div>
+        </div>
+        <div class="itin-day__body">
+          <div class="itin-day__tag">Settling In</div>
+          <h3 class="itin-day__title">The stay opens exactly at the pace you wanted.</h3>
+          <p class="itin-day__copy">A honeymoon can soften. A family trip can stay fluid. A short celebratory escape can feel immediate. The schedule supports the mood instead of dictating it.</p>
+          <div class="itin-day__meta">
+            <span>Private check-in</span>
+            <span>Dining held</span>
+            <span>Time protected</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="itin-day">
+        <div class="itin-day__num">
+          <span class="itin-day__index">03</span>
+          <div class="itin-day__line"></div>
+        </div>
+        <div class="itin-day__body">
+          <div class="itin-day__tag">Changing Scene</div>
+          <h3 class="itin-day__title">The transfer becomes part of the seduction.</h3>
+          <p class="itin-day__copy">Helicopter, launch, light aircraft, or car: we turn the in-between into atmosphere, so moving islands feels like the story deepening rather than pausing.</p>
+          <div class="itin-day__meta">
+            <span>Air or sea leg</span>
+            <span>Window matched</span>
+            <span>No rushed handoff</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="itin-day itin-day--last">
+        <div class="itin-day__num">
+          <span class="itin-day__index">04</span>
+        </div>
+        <div class="itin-day__body">
+          <div class="itin-day__tag">Finale</div>
+          <h3 class="itin-day__title">Even leaving can feel beautifully unhurried.</h3>
+          <p class="itin-day__copy">Because the return was considered from the beginning, the final morning keeps its calm. No scrambling. No visible machinery. Just a soft close to the trip.</p>
+          <div class="itin-day__meta">
+            <span>Aircraft prepared</span>
+            <span>Departure timed</span>
+            <span>Calm final morning</span>
+          </div>
+        </div>
+      </article>
+
+    </div><!-- /itin-timeline -->
+
+    <!-- ── Bottom route band ── -->
+    <div class="itin-route-band" data-reveal="">
+      <div class="itin-route-band__inner">
+        <div class="itin-route-band__copy">
+          <span class="itin-route-band__label">Composed Around You</span>
+          <p class="itin-route-band__headline">No two journeys should follow the same line. They should all arrive with the same ease.</p>
+          <p class="itin-route-band__lede">Stretch it into a slow island disappearance, tighten it into a polished celebratory weekend, or build a multi-stop charter with a different mood at every turn. The routing changes completely. The feeling never breaks.</p>
+          <div class="itin-route-band__chips" aria-label="Journey formats">
+            <span>One-island escape</span>
+            <span>Multi-stop charter</span>
+            <span>Yacht pairing</span>
+            <span>Villa circuit</span>
+          </div>
+        </div>
+
+        <div class="itin-route-band__stage">
+          <div class="itin-route-band__panel">
+            <div class="itin-route-band__panel-head">
+              <span class="itin-route-band__overline">What We Hold</span>
+              <p class="itin-route-band__panel-text">What you are really buying is not a route map. It is the removal of friction from every important handoff.</p>
+            </div>
+
+            <div class="itin-route-band__offer">
+              <article class="itin-route-band__offer-item">
+                <span class="itin-route-band__offer-label">Timing</span>
+                <p>Aircraft, resort, villa, marina, and transfer windows are aligned around the guest day, not left to collide with it.</p>
+              </article>
+              <article class="itin-route-band__offer-item">
+                <span class="itin-route-band__offer-label">Transitions</span>
+                <p>Every inter-island move is sequenced to feel smooth on the ground, at the dock, and in the air.</p>
+              </article>
+              <article class="itin-route-band__offer-item">
+                <span class="itin-route-band__offer-label">Contingency</span>
+                <p>Alternatives are quietly held in reserve so the experience never starts to feel fragile if timing shifts.</p>
+              </article>
+            </div>
+
+            <div class="itin-route-band__microcopy">
+              Coordinated across jet, launch, helicopter, villa, marina, and every invisible handoff that makes the trip feel secure.
+            </div>
+          </div>
+
+          <div class="itin-route-band__actions">
+            <div class="itin-route-band__assurance">
+              <span class="itin-route-band__assurance-value">Every stop held.</span>
+              <span class="itin-route-band__assurance-label">A tailored sequence, timed so the guest experience feels uninterrupted from the first welcome to the final departure.</span>
+            </div>
+
+            <button class="btn btn--tinted itin-route-band__cta" data-contact-trigger="">
+              Compose Your Journey
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </section>
 
 <!-- ══════════════════════════════════════════
@@ -155,6 +332,7 @@
       <span class="island-num">01</span>
       <div class="island-name">Mahé</div>
       <span class="island-tag">The Heart · Victoria</span>
+      <span class="island-cta">View Island</span>
     </div>
   </div>
   <div class="island">
@@ -164,6 +342,7 @@
       <span class="island-num">02</span>
       <div class="island-name">Praslin</div>
       <span class="island-tag">Vallée de Mai · UNESCO</span>
+      <span class="island-cta">View Island</span>
     </div>
   </div>
   <div class="island">
@@ -173,6 +352,7 @@
       <span class="island-num">03</span>
       <div class="island-name">La Digue</div>
       <span class="island-tag">Timeless · Untouched</span>
+      <span class="island-cta">View Island</span>
     </div>
   </div>
 </section>
@@ -190,11 +370,167 @@
     <h2 class="booking-title">Your story begins<br>with <em>a single call.</em></h2>
     <p class="booking-body">Our specialists are available around the clock to compose your journey — aircraft, routing, villas, transfers. Everything.</p>
     <div class="booking-actions">
-      <button class="btn-p">Request a Charter</button>
-      <button class="btn-g">Speak to a Specialist</button>
+      <button class="btn btn--primary btn-p" type="button" data-contact-trigger="charter">Request a Charter</button>
+      <button class="btn btn--ghost btn-g" type="button" data-contact-trigger="specialist">Speak to a Specialist</button>
     </div>
   </div>
 </section>
+
+<div class="contact-modal" id="contact-modal" aria-hidden="true">
+  <div class="contact-modal__backdrop" data-close-modal></div>
+  <div class="contact-modal__panel" role="dialog" aria-modal="true" aria-labelledby="contact-modal-title">
+    <button class="contact-modal__close" type="button" aria-label="Close contact form" data-close-modal>
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </button>
+    <div class="contact-modal__view is-active" data-modal-view="form">
+      <div class="contact-modal__content">
+        <div class="contact-modal__copy">
+          <div class="contact-modal__kicker">
+            <span class="contact-modal__kicker-line"></span>
+            Request A Charter
+            <span class="contact-modal__kicker-line"></span>
+          </div>
+          <h2 class="contact-modal__title" id="contact-modal-title">Your Trip, Done Right.</h2>
+          <p class="contact-modal__text">A short brief is enough to start. Share the essentials and we will come back with the right aircraft, timing, and next steps.</p>
+          <div class="contact-modal__visual" aria-hidden="true">
+            <div class="contact-modal__scene" id="contact-modal-scene">
+              <div class="contact-modal__scene-copy">
+                <span class="contact-modal__scene-label">From runway to villa</span>
+                <strong>Every handoff arranged before you land.</strong>
+              </div>
+            </div>
+            <div class="contact-modal__rail">
+              <span class="contact-modal__rail-item">Aircraft selection</span>
+              <span class="contact-modal__rail-item">Island routing</span>
+              <span class="contact-modal__rail-item">Villa coordination</span>
+            </div>
+          </div>
+        </div>
+        <form class="contact-form" id="contact-form">
+          <div class="contact-form__grid">
+            <label class="contact-field">
+              <span>Name</span>
+              <input type="text" name="name" autocomplete="name" required>
+            </label>
+            <label class="contact-field">
+              <span>Email</span>
+              <input type="email" name="email" autocomplete="email" required>
+            </label>
+            <label class="contact-field">
+              <span>Phone</span>
+              <input type="tel" name="phone" autocomplete="tel">
+            </label>
+            <label class="contact-field">
+              <span>Route</span>
+              <select name="route" required>
+                <option value="" selected disabled>Select a route</option>
+                <option value="london-mahe">London to Mahé</option>
+                <option value="dubai-mahe">Dubai to Mahé</option>
+                <option value="mahe-praslin">Mahé to Praslin</option>
+                <option value="mahe-ladigue">Mahé to La Digue</option>
+                <option value="multi-island">Multi-island Seychelles</option>
+              </select>
+            </label>
+            <label class="contact-field">
+              <span>Departure</span>
+              <input type="date" name="departure" required>
+            </label>
+            <label class="contact-field">
+              <span>Return</span>
+              <input type="date" name="return" required>
+            </label>
+            <label class="contact-field contact-field--full">
+              <span>Notes</span>
+              <textarea name="notes" rows="5" placeholder="Passengers, baggage, villa transfer timing, or anything else that matters."></textarea>
+            </label>
+          </div>
+          <div class="contact-form__actions">
+            <button class="btn btn--primary btn-p contact-form__submit" type="submit">Send Request</button>
+            <p class="contact-form__note">We use this to prepare a tailored first response, not a generic callback.</p>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="contact-modal__view" data-modal-view="success">
+      <div class="contact-modal__success">
+        <div class="quote-kicker">Request Received</div>
+        <h2 class="contact-modal__title">Your message is in. The next step stays with us.</h2>
+        <p class="contact-modal__text">We have your enquiry and will follow up with the right routing and charter options for the trip.</p>
+        <button class="btn btn--ghost btn-g contact-modal__done" type="button" data-close-modal>Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="island-modal" id="island-modal" aria-hidden="true">
+  <div class="island-modal__backdrop" data-close-island-modal></div>
+  <div class="island-modal__panel" role="dialog" aria-modal="true" aria-labelledby="island-modal-title">
+    <button class="contact-modal__close island-modal__close" type="button" aria-label="Close island details" data-close-island-modal>
+      <span aria-hidden="true">X</span>
+    </button>
+    <div class="island-modal__content">
+      <div class="island-modal__shell">
+        <div class="island-modal__visual">
+          <div class="island-modal__media" id="island-modal-media">
+            <div class="island-modal__media-top">
+              <div class="quote-kicker" id="island-modal-kicker">Island Focus</div>
+              <span class="island-modal__index" id="island-modal-index">01</span>
+            </div>
+            <div class="island-modal__chips">
+              <span class="island-modal__chip" id="island-modal-chip-1">Private arrivals</span>
+              <span class="island-modal__chip" id="island-modal-chip-2">Villa access</span>
+              <span class="island-modal__chip" id="island-modal-chip-3">Island transfers</span>
+            </div>
+            <div class="island-modal__spotlight">
+              <span class="island-modal__spotlight-label">Atmosphere</span>
+              <strong id="island-modal-spotlight">The polished gateway into Seychelles.</strong>
+            </div>
+          </div>
+          <div class="island-modal__stats">
+            <article class="island-modal__stat">
+              <span class="island-modal__stat-value" id="island-modal-stat-value-1">01</span>
+              <span class="island-modal__stat-label" id="island-modal-stat-label-1">Primary arrival island</span>
+            </article>
+            <article class="island-modal__stat">
+              <span class="island-modal__stat-value" id="island-modal-stat-value-2">24/7</span>
+              <span class="island-modal__stat-label" id="island-modal-stat-label-2">Charter coordination</span>
+            </article>
+            <article class="island-modal__stat">
+              <span class="island-modal__stat-value" id="island-modal-stat-value-3">Fast</span>
+              <span class="island-modal__stat-label" id="island-modal-stat-label-3">Runway to resort timing</span>
+            </article>
+          </div>
+        </div>
+        <div class="island-modal__info">
+          <div class="island-modal__intro">
+            <h2 class="contact-modal__title island-modal__title" id="island-modal-title">Mahé</h2>
+            <p class="contact-modal__text island-modal__text" id="island-modal-description">The principal arrival island, where private aviation, marina departures, and hillside estates connect in the most seamless way.</p>
+          </div>
+          <div class="island-modal__grid">
+            <article class="island-modal__card">
+              <span class="island-modal__label" id="island-modal-label-1">Arrival Rhythm</span>
+              <p id="island-modal-detail-1">Private aviation access with the easiest onward coordination for estates, marinas, and resort transfers.</p>
+            </article>
+            <article class="island-modal__card">
+              <span class="island-modal__label" id="island-modal-label-2">Why It Matters</span>
+              <p id="island-modal-detail-2">Ideal when the trip starts with business, a larger villa arrival, or the need for a polished first landing.</p>
+            </article>
+            <article class="island-modal__card">
+              <span class="island-modal__label" id="island-modal-label-3">Best For</span>
+              <p id="island-modal-detail-3">Guests who want the smoothest arrival chain before continuing deeper into the islands.</p>
+            </article>
+          </div>
+          <div class="island-modal__actions">
+            <button class="btn btn--primary btn-p island-modal__primary" type="button" id="island-modal-charter">Request a Charter</button>
+            <button class="btn btn--ghost btn-g island-modal__secondary" type="button" data-close-island-modal>Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- FOOTER -->
 <footer>

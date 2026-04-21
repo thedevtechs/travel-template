@@ -17,10 +17,114 @@ const nudge = document.getElementById('nudge');
 const nav = document.getElementById('nav');
 const navToggle = document.getElementById('nav-toggle');
 const mobileMenu = document.getElementById('mobile-menu');
-const bookSection = document.getElementById('book');
+const contactModal = document.getElementById('contact-modal');
+const contactForm = document.getElementById('contact-form');
+const bookingImage = document.querySelector('.booking-bg img');
+const contactModalScene = document.getElementById('contact-modal-scene');
+const contactRouteField = contactForm?.elements.namedItem('route');
+const contactNotesField = contactForm?.elements.namedItem('notes');
+const contactViews = contactModal ? Array.from(contactModal.querySelectorAll('[data-modal-view]')) : [];
+const contactTriggers = Array.from(document.querySelectorAll('[data-contact-trigger]'));
+const islandCards = Array.from(document.querySelectorAll('.islands .island'));
+const islandModal = document.getElementById('island-modal');
+const islandModalKicker = document.getElementById('island-modal-kicker');
+const islandModalIndex = document.getElementById('island-modal-index');
+const islandModalTitle = document.getElementById('island-modal-title');
+const islandModalDescription = document.getElementById('island-modal-description');
+const islandModalMedia = document.getElementById('island-modal-media');
+const islandModalChips = [
+  document.getElementById('island-modal-chip-1'),
+  document.getElementById('island-modal-chip-2'),
+  document.getElementById('island-modal-chip-3')
+];
+const islandModalSpotlight = document.getElementById('island-modal-spotlight');
+const islandModalStatValues = [
+  document.getElementById('island-modal-stat-value-1'),
+  document.getElementById('island-modal-stat-value-2'),
+  document.getElementById('island-modal-stat-value-3')
+];
+const islandModalStatLabels = [
+  document.getElementById('island-modal-stat-label-1'),
+  document.getElementById('island-modal-stat-label-2'),
+  document.getElementById('island-modal-stat-label-3')
+];
+const islandModalLabels = [
+  document.getElementById('island-modal-label-1'),
+  document.getElementById('island-modal-label-2'),
+  document.getElementById('island-modal-label-3')
+];
+const islandModalDetails = [
+  document.getElementById('island-modal-detail-1'),
+  document.getElementById('island-modal-detail-2'),
+  document.getElementById('island-modal-detail-3')
+];
+const islandModalCharter = document.getElementById('island-modal-charter');
 const mobileBreakpoint = window.matchMedia('(max-width: 768px)');
 
 let zoomIntensity = 1;
+let lastContactTrigger = null;
+let lastIslandTrigger = null;
+let activeIslandId = null;
+
+const islandContent = {
+  mahe: {
+    kicker: 'Island One',
+    index: '01',
+    title: 'Mahé',
+    description: 'The principal arrival island, where private aviation, marina departures, and hillside estates connect in the most seamless way.',
+    chips: ['Private arrivals', 'Villa access', 'Marina links'],
+    spotlight: 'The polished gateway into Seychelles.',
+    stats: [
+      { value: '01', label: 'Primary arrival island' },
+      { value: '24/7', label: 'Charter coordination' },
+      { value: 'Fast', label: 'Runway to resort timing' }
+    ],
+    cards: [
+      { label: 'Arrival Rhythm', detail: 'A refined first touchdown with straightforward ground handling, resort transfers, and the easiest onward coordination.' },
+      { label: 'Why It Matters', detail: 'Best when the trip starts with a major villa arrival, yacht connection, or guests who want everything lined up from the runway forward.' },
+      { label: 'Best For', detail: 'Travellers wanting the strongest mix of access, privacy, and polished logistics before moving through the rest of Seychelles.' }
+    ],
+    charterNote: 'Interested in planning a Mahé arrival and onward charter coordination.'
+  },
+  praslin: {
+    kicker: 'Island Two',
+    index: '02',
+    title: 'Praslin',
+    description: 'More hushed and garden-like, with quick access to iconic beaches and a calmer pace the moment the arrival settles.',
+    chips: ['Beach estates', 'Slow luxury', 'Nature-led'],
+    spotlight: 'A quieter handoff into barefoot island life.',
+    stats: [
+      { value: '02', label: 'Second-island pace' },
+      { value: 'Soft', label: 'Arrival atmosphere' },
+      { value: 'Calm', label: 'Resort-first rhythm' }
+    ],
+    cards: [
+      { label: 'Arrival Rhythm', detail: 'A softer handoff into resort life, ideal for guests who want the island portion of the journey to begin immediately.' },
+      { label: 'Why It Matters', detail: 'Strong choice for couples, slow-luxury stays, and itineraries built around beach time rather than transit between stops.' },
+      { label: 'Best For', detail: 'Travellers prioritising quiet villas, natural beauty, and a shorter path from aircraft planning to true downtime.' }
+    ],
+    charterNote: 'Interested in a Praslin-focused charter with quiet arrival planning.'
+  },
+  ladigue: {
+    kicker: 'Island Three',
+    index: '03',
+    title: 'La Digue',
+    description: 'The most unhurried of the three, better suited to travellers who want intimacy, low-key movement, and the feeling of slipping off-grid elegantly.',
+    chips: ['Low-key', 'Timeless', 'Retreat-minded'],
+    spotlight: 'The most intimate finish to a Seychelles journey.',
+    stats: [
+      { value: '03', label: 'Most secluded feel' },
+      { value: 'Quiet', label: 'Arrival energy' },
+      { value: 'Slow', label: 'Island cadence' }
+    ],
+    cards: [
+      { label: 'Arrival Rhythm', detail: 'A more delicate transfer sequence, but one that rewards careful planning with a deeply private final approach.' },
+      { label: 'Why It Matters', detail: 'This island is about texture and atmosphere, so the journey works best when every handoff is timed to feel effortless.' },
+      { label: 'Best For', detail: 'Travellers who want Seychelles at its most timeless, with minimal noise and maximum sense of retreat.' }
+    ],
+    charterNote: 'Interested in a La Digue transfer plan with discreet charter support.'
+  }
+};
 
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -35,6 +139,15 @@ function easeOut(t) {
 
 function easeIn(t) {
   return t * t * t;
+}
+
+function syncModalState() {
+  const hasOpenModal = Boolean(
+    contactModal?.classList.contains('is-open') ||
+    islandModal?.classList.contains('is-open')
+  );
+
+  document.body.classList.toggle('modal-open', hasOpenModal);
 }
 
 // Smooth, cinematic zoom curve — no explosive jump
@@ -168,7 +281,7 @@ mobileMenu.querySelectorAll('a, button').forEach(el => {
 document.querySelectorAll('.nav-cta').forEach(el => {
   el.addEventListener('click', () => {
     setNavOpen(false);
-    bookSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    openContactModal(el);
   });
 });
 
@@ -178,6 +291,16 @@ document.addEventListener('click', e => {
 });
 
 document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && islandModal?.classList.contains('is-open')) {
+    closeIslandModal();
+    return;
+  }
+
+  if (e.key === 'Escape' && contactModal?.classList.contains('is-open')) {
+    closeContactModal();
+    return;
+  }
+
   if (e.key === 'Escape' && nav.classList.contains('open')) {
     setNavOpen(false);
     navToggle.focus();
@@ -212,6 +335,159 @@ const observer = new IntersectionObserver(entries => {
 }, { threshold: 0.15 });
 
 document.querySelectorAll('[data-reveal]').forEach(el => observer.observe(el));
+
+// Day cards need individual observation (they start opacity:0 independently)
+const dayObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      dayObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.08 });
+
+document.querySelectorAll('.itin-day').forEach(el => dayObserver.observe(el));
+
+/* ════════════════════════════════════════════
+   CONTACT MODAL
+════════════════════════════════════════════ */
+function setContactView(viewName) {
+  contactViews.forEach(view => {
+    view.classList.toggle('is-active', view.dataset.modalView === viewName);
+  });
+}
+
+function openContactModal(trigger, preset = {}) {
+  if (!contactModal) return;
+  lastContactTrigger = trigger ?? null;
+  setContactView('form');
+  contactModal.classList.add('is-open');
+  contactModal.setAttribute('aria-hidden', 'false');
+
+  if (typeof preset.route === 'string' && contactRouteField instanceof HTMLSelectElement) {
+    contactRouteField.value = preset.route;
+  }
+
+  if (typeof preset.notes === 'string' && contactNotesField instanceof HTMLTextAreaElement) {
+    contactNotesField.value = preset.notes;
+  }
+
+  syncModalState();
+  contactModal.querySelector('input, textarea')?.focus();
+}
+
+function closeContactModal() {
+  if (!contactModal) return;
+  contactModal.classList.remove('is-open');
+  contactModal.setAttribute('aria-hidden', 'true');
+  setContactView('form');
+  syncModalState();
+  lastContactTrigger?.focus();
+}
+
+function renderIslandModal(islandId) {
+  const content = islandContent[islandId];
+  if (!content) return;
+
+  islandModalKicker.textContent = content.kicker;
+  islandModalIndex.textContent = content.index;
+  islandModalTitle.textContent = content.title;
+  islandModalDescription.textContent = content.description;
+  islandModalSpotlight.textContent = content.spotlight;
+
+  content.chips.forEach((chip, index) => {
+    islandModalChips[index].textContent = chip;
+  });
+
+  content.stats.forEach((stat, index) => {
+    islandModalStatValues[index].textContent = stat.value;
+    islandModalStatLabels[index].textContent = stat.label;
+  });
+
+  content.cards.forEach((card, index) => {
+    islandModalLabels[index].textContent = card.label;
+    islandModalDetails[index].textContent = card.detail;
+  });
+}
+
+function openIslandModal(islandId, trigger) {
+  if (!islandModal || !islandContent[islandId]) return;
+  activeIslandId = islandId;
+  lastIslandTrigger = trigger ?? null;
+  renderIslandModal(islandId);
+
+  const islandImage = trigger?.querySelector('img');
+  if (islandImage instanceof HTMLImageElement) {
+    islandModalMedia.style.backgroundImage = `linear-gradient(180deg, oklch(0% 0 0 / .04), oklch(0% 0 0 / .56)), url("${islandImage.src}")`;
+  }
+
+  islandModal.classList.add('is-open');
+  islandModal.setAttribute('aria-hidden', 'false');
+  syncModalState();
+  islandModal.querySelector('[data-close-island-modal]')?.focus();
+}
+
+function closeIslandModal(restoreFocus = true) {
+  if (!islandModal) return;
+  islandModal.classList.remove('is-open');
+  islandModal.setAttribute('aria-hidden', 'true');
+  activeIslandId = null;
+  syncModalState();
+
+  if (restoreFocus) {
+    lastIslandTrigger?.focus();
+  }
+}
+
+contactTriggers.forEach(trigger => {
+  if (trigger.classList.contains('nav-cta')) return;
+  trigger.addEventListener('click', () => openContactModal(trigger));
+});
+
+contactModal?.querySelectorAll('[data-close-modal]').forEach(el => {
+  el.addEventListener('click', closeContactModal);
+});
+
+contactForm?.addEventListener('submit', e => {
+  e.preventDefault();
+  contactForm.reset();
+  setContactView('success');
+  contactModal?.querySelector('.contact-modal__done')?.focus();
+});
+
+islandCards.forEach((card, index) => {
+  const islandId = ['mahe', 'praslin', 'ladigue'][index];
+  if (!islandId) return;
+
+  card.setAttribute('role', 'button');
+  card.setAttribute('tabindex', '0');
+  card.setAttribute('aria-haspopup', 'dialog');
+  card.setAttribute('aria-label', `Open ${islandContent[islandId].title} details`);
+
+  card.addEventListener('click', () => openIslandModal(islandId, card));
+  card.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    openIslandModal(islandId, card);
+  });
+});
+
+islandModal?.querySelectorAll('[data-close-island-modal]').forEach(el => {
+  el.addEventListener('click', () => closeIslandModal());
+});
+
+islandModalCharter?.addEventListener('click', () => {
+  const content = activeIslandId ? islandContent[activeIslandId] : null;
+  const trigger = lastIslandTrigger ?? islandModalCharter;
+  closeIslandModal(false);
+  openContactModal(trigger, {
+    notes: content?.charterNote ?? ''
+  });
+});
+
+if (bookingImage instanceof HTMLImageElement && contactModalScene) {
+  contactModalScene.style.backgroundImage = `linear-gradient(180deg, oklch(0% 0 0 / .08), oklch(0% 0 0 / .52)), url("${bookingImage.src}")`;
+}
 
 /* ════════════════════════════════════════════
    TWEAKS
